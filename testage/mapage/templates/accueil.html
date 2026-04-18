@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Ma première page</title>
-</head>
-<body>
-    <h1>Bonjour depuis Django !</h1>
-    <p>Voici ma première page web avec Django.</p>
-</body>
-</html>
+{%extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Bannière avec bouton de connexion -->
+<div class="jumbotron text-center" style="background-color: #f8f9fa; padding: 2rem; margin-bottom: 2rem;">
+  <h1 class="display-4">Bienvenue sur notre app de décision collective !</h1>
+  <p class="lead">Participez aux débats, votez et prenez des décisions ensemble.</p>
+  {% if user.is_authenticated %}
+    <p>Bonjour, {{ user.username }} !</p>
+    <a href="{% url 'custom_logout' %}" class="btn btn-outline-danger">Déconnexion</a>
+  {% else %}
+    <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg">Se connecter</a>
+    <a href="{% url 'account_signup' %}" class="btn btn-secondary btn-lg">S'inscrire</a>
+  {% endif %}
+</div>
+
+<!-- Contenu de la page -->
+<div class="container">
+  <p>Rejoignez une communauté pour participer aux décisions collectives !</p>
+</div>
+{% endblock %}

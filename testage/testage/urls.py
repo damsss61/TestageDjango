@@ -22,4 +22,6 @@ from mapage import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('mapage.urls')),
+    path('accounts/', include('allauth.urls')),
+    path('logout/', views.custom_logout, name='custom_logout'),
 ]
