@@ -23,8 +23,9 @@ def create_resolution(request):
         if form.is_valid():
             resolution = form.save(commit=False)
             resolution.created_by = request.user  # Associe la résolution à l'utilisateur connecté
+            resolution.status = 'draft'  # Définit le statut initial à 'draft'
             resolution.save()
             return redirect('accueil')  # Redirige vers la page d'accueil après la création
     else:
-        form = ResolutionForm()
+        form = ResolutionForm(initial={'status': 'draft'})
     return render(request, 'create_resolution.html', {'form': form})

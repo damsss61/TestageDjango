@@ -3,15 +3,16 @@
 
 {% block content %}
 <!-- Bannière avec bouton de connexion -->
-<div class="jumbotron text-center" style="background-color: #f8f9fa; padding: 4rem; margin-bottom: 2rem; border-radius: 0.5rem;">
+<div class="jumbotron text-center"
+  style="background-color: #f8f9fa; padding: 4rem; margin-bottom: 2rem; border-radius: 0.5rem;">
   <h1 class="display-4">Bienvenue sur notre app de décision collective !</h1>
   <p class="lead">Participez aux débats, votez et prenez des décisions ensemble.</p>
   {% if user.is_authenticated %}
-    <p>Bonjour, {{ user.username }} !</p>
-    <a href="{% url 'custom_logout' %}" class="btn btn-outline-danger">Déconnexion</a>
+  <p>Bonjour, {{ user.username }} !</p>
+  <a href="{% url 'custom_logout' %}" class="btn btn-outline-danger">Déconnexion</a>
   {% else %}
-    <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg">Se connecter</a>
-    <a href="{% url 'account_signup' %}" class="btn btn-secondary btn-lg ms-2">S'inscrire</a>
+  <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg">Se connecter</a>
+  <a href="{% url 'account_signup' %}" class="btn btn-secondary btn-lg ms-2">S'inscrire</a>
   {% endif %}
 </div>
 
@@ -19,7 +20,9 @@
 <div class="container mb-5">
   <h2 class="text-center mb-4">Résolutions en cours
     {% if user.is_authenticated %}
-      <a href="{% url 'create_resolution' %}" class="btn btn-success float-end">+ Nouvelle résolution</a>
+    <a href="{% url 'create_resolution' %}" class="btn btn-success float-end">+ Nouvelle résolution</a>
+    {% else %}
+    <p>Rejoignez une communauté pour participer aux décisions collectives !</p>
     {% endif %}
   </h2>
 
@@ -27,54 +30,25 @@
     {% if user.is_authenticated %}
     <!-- Carte pour créer une nouvelle résolution -->
     <div class="col">
-      <div class="card h-100 shadow-sm border-primary text-center" style="cursor: pointer;" onclick="window.location.href='{% url 'create_resolution' %}'">
+      <div class="card h-100 shadow-sm border-primary text-center" style="cursor: pointer;"
+        onclick="window.location.href='{% url 'create_resolution' %}'">
         <div class="card-body d-flex flex-column justify-content-center">
           <h5 class="card-title"><i class="bi bi-plus-lg" style="font-size: 2rem;"></i></h5>
           <p class="card-text">Créer une nouvelle résolution</p>
         </div>
       </div>
     </div>
-    {% endif %}
-
     {% for resolution in resolutions %}
     <!-- Cartes des résolutions existantes -->
-    <div class="col">
-      <div class="card h-100 shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">{{ resolution.title }}</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Posée par {{ resolution.created_by.username }}</h6>
-          <p class="card-text">{{ resolution.question }}</p>
-          <p class="card-text text-muted">{{ resolution.context|truncatechars:100 }}</p>
-        </div>
-        <div class="card-footer bg-transparent">
-          <a href="#" class="btn btn-sm btn-outline-primary">Voir les détails</a>
-        </div>
-      </div>
-    </div>
+    {% include 'resolution_card.html' with resolution=resolution %}
     {% empty %}
     <div class="col-12">
       <div class="alert alert-info text-center">Aucune résolution en cours.</div>
     </div>
     {% endfor %}
+    {% endif %}
+
+
   </div>
 </div>
-
-<style>
-  .card {
-    transition: transform 0.2s;
-  }
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-  }
-  .card-title i {
-    color: #4a6fa5;
-  }
-  .card.border-primary {
-    border: 2px dashed #4a6fa5 !important;
-  }
-  .card.border-primary:hover {
-    background-color: rgba(74, 111, 165, 0.05);
-  }
-</style>
 {% endblock %}

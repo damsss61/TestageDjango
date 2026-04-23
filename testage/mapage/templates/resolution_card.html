@@ -1,0 +1,77 @@
+<!-- templates/mon_app/resolution_card.html -->
+<div class="col">
+  <div class="card h-100 shadow-sm">
+    <!-- Ruban pour le statut -->
+    <div class="ribbon ribbon-{{ resolution.status }}">
+      <span>{{ resolution.get_status_display }}</span>
+    </div>
+
+    <div class="card-body">
+      <h5 class="card-title">{{ resolution.title }}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Posée par {{ resolution.created_by.username }}</h6>
+      <p class="card-text">{{ resolution.question }}</p>
+      <p class="card-text text-muted">{{ resolution.context|truncatechars:100 }}</p>
+    </div>
+    <div class="card-footer bg-transparent">
+      <a href="#" class="btn btn-sm btn-outline-primary">Voir les détails</a>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Style pour le ruban */
+.ribbon {
+    position: absolute;
+    top: 30px;
+    right: -80px;
+    width: 300px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: #6c757d; /* Couleur par défaut */
+    color: white;
+    font-size: 0.8rem;
+    font-weight: bold;
+    transform: rotate(35deg);
+    z-index: 1;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Couleurs selon le statut */
+  .ribbon-draft {
+    background-color: #6c757d;  /* Gris */
+  }
+  .ribbon-evaluation {
+    background-color: #0d6efd;  /* Bleu */
+  }
+  .ribbon-voting {
+    background-color: #ffc107;  /* Jaune */
+    color: black;
+  }
+  .ribbon-resolved {
+    background-color: #198754;  /* Vert */
+  }
+
+/* Style pour la carte */
+.card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+
+.card-title i {
+    color: #4a6fa5;
+  }
+.card.border-primary {
+    border: 2px dashed #4a6fa5 !important;
+  }
+
+.card.border-primary:hover {
+    background-color: rgba(74, 111, 165, 0.05);
+  }
+</style>
