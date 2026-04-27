@@ -13,7 +13,11 @@
       <p class="card-text text-muted">{{ resolution.context|truncatechars:100 }}</p>
     </div>
     <div class="card-footer bg-transparent">
-      <a href="#" class="btn btn-sm btn-outline-primary">Voir les détails</a>
+      {% if resolution.status == 'draft' and request.user == resolution.created_by %}
+        <a href="{% url 'edit_resolution' resolution.id %}" class="btn btn-sm btn-outline-primary">Éditer</a>
+      {% else %}
+         <a href="{% url 'resolution_details' resolution.id %}" class="btn btn-sm btn-outline-primary">Voir les détails</a>
+      {% endif %}
     </div>
   </div>
 </div>
