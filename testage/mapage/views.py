@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth import logout
-from .models import Resolution, Comment
+from .models import Resolution, Comment, UserResolutionComment
 from .forms import ResolutionForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.db import models
@@ -16,11 +16,19 @@ def accueil(request):
             models.Q(is_active=True),
             ~models.Q(status='draft') | models.Q(created_by=request.user, status='draft')
         ).order_by('-created_at')
+        # Récupère les résolutions que l'utilisateur a commentées
+        user_commented_resolutions = UserResolutionComment.objects.filter(
+            user=request.user, has_commented=True
+        ).values_list('resolution_id', flat=True)
     else:
         # Résolutions publiques (non-draft) pour les utilisateurs non connectés
         resolutions = Resolution.objects.filter(is_active=True).exclude(status='draft').order_by('-created_at')
+        user_commented_resolutions = []
 
-    return render(request, 'accueil.html', {'resolutions': resolutions})
+    return render(request, 'accueil.html', {
+        'resolutions': resolutions,
+        'user_commented_resolutions': user_commented_resolutions
+    })
 
 def custom_logout(request):
     logout(request)
@@ -81,6 +89,7 @@ def resolution_details(request, resolution_id):
 @login_required
 def add_comment(request, resolution_id):
     resolution = get_object_or_404(Resolution, id=resolution_id)
+    user_opinions = Comment.objects.filter(author=request.user, resolution=resolution).order_by('-created_at')
 
     if request.method == 'POST':
         form = CommentForm(request.POST)
@@ -93,10 +102,47 @@ def add_comment(request, resolution_id):
     else:
         form = CommentForm()
 
-    return render(request, 'add_comment.html', {'form': form, 'resolution': resolution})
+    return render(request, 'add_comment.html', {
+        'form': form,
+        'resolution': resolution,
+        'user_opinions': user_opinions
+    })
+
+@login_required
+def delete_opinion(request, opinion_id):
+    opinion = get_object_or_404(Comment, id=opinion_id, author=request.user)
+    resolution_id = opinion.resolution.id
+    opinion.delete()
+    return redirect('add_comment', resolution_id=resolution_id)
 
 @login_required
 def read_comments(request, resolution_id):
     resolution = get_object_or_404(Resolution, id=resolution_id)
     comments = Comment.objects.filter(resolution=resolution).order_by('-created_at')
     return render(request, 'read_comments.html', {'resolution': resolution, 'comments': comments})
+
+@login_required
+def upvote_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    # Vérifie si l'utilisateur a déjà upvoté
+    if request.user in comment.upvotes.all():
+        comment.upvotes.remove(request.user)  # Retire le vote si déjà présent
+    else:
+        comment.upvotes.add(request.user)  # Ajoute le vote
+        # Retire le downvote si l'utilisateur avait downvoté
+        if request.user in comment.downvotes.all():
+            comment.downvotes.remove(request.user)
+    return redirect(request.META.get('HTTP_REFERER', 'home'))
+
+@login_required
+def downvote_comment(request, comment_id):
+    comment = get_object_or_404(Comment, id=comment_id)
+    # Vérifie si l'utilisateur a déjà downvoté
+    if request.user in comment.downvotes.all():
+        comment.downvotes.remove(request.user)  # Retire le vote si déjà présent
+    else:
+        comment.downvotes.add(request.user)  # Ajoute le vote
+        # Retire l'upvote si l'utilisateur avait upvoté
+        if request.user in comment.upvotes.all():
+            comment.upvotes.remove(request.user)
+    return redirect(request.META.get('HTTP_REFERER', 'home'))

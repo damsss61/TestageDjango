@@ -16,7 +16,12 @@
       {% if resolution.status == 'draft' and request.user == resolution.created_by %}
         <a href="{% url 'edit_resolution' resolution.id %}" class="btn btn-sm btn-outline-primary">Éditer</a>
       {% else %}
-         <a href="{% url 'resolution_details' resolution.id %}" class="btn btn-sm btn-outline-primary">Voir les détails</a>
+        <a href="{% url 'resolution_details' resolution.id %}" class="btn btn-sm btn-outline-primary">Voir les détails</a>
+        {% if resolution.status == 'evaluation' and request.user.is_authenticated %}
+          {% if resolution.id in user_commented_resolutions %}
+            <a href="{% url 'read_comments' resolution.id %}" class="btn btn-sm btn-outline-success">Lire les commentaires</a>
+          {% endif %}
+        {% endif %}
       {% endif %}
     </div>
   </div>

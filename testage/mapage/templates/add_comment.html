@@ -1,26 +1,56 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 
-{% block title %}Ajouter un commentaire - {{ resolution.title }}{% endblock %}
+{% block title %}Ajouter une opinion - {{ resolution.title }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
-            <div class="card shadow">
+            <!-- Section pour ajouter une opinion -->
+            <div class="card shadow mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Ajouter une opinion pour "{{ resolution.title }}"</h5>
+                </div>
                 <div class="card-body">
-                    <h2 class="card-title text-center mb-4">Ajouter un commentaire</h2>
-                    <h5 class="text-center mb-4">{{ resolution.title }}</h5>
                     <form method="post">
                         {% csrf_token %}
                         {{ form|crispy }}
                         <div class="d-grid gap-2 mt-4">
-                            <button type="submit" class="btn btn-primary">Publier le commentaire</button>
-                            <a href="{% url 'resolution_details' resolution.id %}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Publier l'opinion</button>
+                            <a href="{% url 'read_comments' resolution.id %}" class="btn btn-secondary">Annuler</a>
                         </div>
                     </form>
                 </div>
             </div>
+
+            <!-- Section pour lister les opinions de l'utilisateur -->
+            {% if user_opinions %}
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">Vos opinions pour cette résolution</h5>
+                </div>
+                <div class="card-body">
+                    {% for opinion in user_opinions %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="card-text mb-0">{{ opinion.content|linebreaks }}</p>
+                                    <small class="text-muted">{{ opinion.created_at|date:"d/m/Y à H:i" }}</small>
+                                </div>
+                                <div>
+                                    <a href="{% url 'delete_opinion' opinion.id %}" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash"></i> Supprimer
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
         </div>
     </div>
 </div>

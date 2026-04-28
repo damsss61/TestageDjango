@@ -12,17 +12,34 @@
                     <a href="{% url 'resolution_details' resolution.id %}" class="btn btn-sm btn-secondary">Retour à la résolution</a>
                 </div>
                 <div class="card-body">
-                    <a href="{% url 'add_comment' resolution.id %}" class="btn btn-primary mb-3">Ajouter un commentaire</a>
+                    <a href="{% url 'add_comment' resolution.id %}" class="btn btn-primary mb-3">Mes opinions</a>
 
                     {% if comments %}
                         {% for comment in comments %}
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between">
-                                    <h6 class="card-subtitle mb-2 text-muted">{{ comment.author.username }}</h6>
-                                    <small class="text-muted">{{ comment.created_at|date:"d/m/Y à H:i" }}</small>
+                                    <div>
+                                        <h6 class="card-subtitle mb-2 text-muted">{{ comment.author.username }}</h6>
+                                        <p class="card-text">{{ comment.content|linebreaks }}</p>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <!-- Boutons de vote -->
+                                        <div class="d-flex flex-column align-items-center me-3">
+                                            <a href="{% url 'upvote_comment' comment.id %}" class="text-decoration-none text-success">
+                                                <i class="bi bi-arrow-up-circle{% if request.user in comment.upvotes.all %}-fill{% endif %}"></i>
+                                            </a>
+                                            <span class="text-muted">{{ comment.total_upvotes }}</span>
+                                        </div>
+                                        <div class="d-flex flex-column align-items-center">
+                                            <a href="{% url 'downvote_comment' comment.id %}" class="text-decoration-none text-danger">
+                                                <i class="bi bi-arrow-down-circle{% if request.user in comment.downvotes.all %}-fill{% endif %}"></i>
+                                            </a>
+                                            <span class="text-muted">{{ comment.total_downvotes }}</span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <p class="card-text">{{ comment.content|linebreaks }}</p>
+                                <small class="text-muted">{{ comment.created_at|date:"d/m/Y à H:i" }}</small>
                             </div>
                         </div>
                         {% endfor %}
