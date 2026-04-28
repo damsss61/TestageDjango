@@ -5,7 +5,7 @@
 <!-- Bannière avec bouton de connexion -->
 <div class="jumbotron text-center"
   style="background-color: #f8f9fa; padding: 4rem; margin-bottom: 2rem; border-radius: 0.5rem;">
-  <h1 class="display-4">Bienvenue sur notre app de décision collective !</h1>
+  <h1 class="display-4">Bienvenue sur votre app de décision collective !</h1>
   <p class="lead">Participez aux débats, votez et prenez des décisions ensemble.</p>
   {% if user.is_authenticated %}
   <p>Bonjour, {{ user.username }} !</p>
@@ -18,8 +18,9 @@
 
 <!-- Section des résolutions -->
 <div class="container mb-5">
-  <h2 class="text-center mb-4">Résolutions en cours
+  <h2 class="text-center mb-4">
     {% if user.is_authenticated %}
+    Résolutions en cours
     <a href="{% url 'create_resolution' %}" class="btn btn-success float-end">+ Nouvelle résolution</a>
     {% else %}
     <p>Rejoignez une communauté pour participer aux décisions collectives !</p>
