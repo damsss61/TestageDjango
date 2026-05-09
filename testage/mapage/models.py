@@ -57,3 +57,57 @@ class UserResolutionComment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} a commenté {self.resolution.title}"
+class Vote(models.Model):
+    # Jugements qualitatifs
+    JUDGMENT_EXCELLENT = 'excellent'
+    JUDGMENT_GOOD = 'good'
+    JUDGMENT_AVERAGE = 'average'
+    JUDGMENT_BAD = 'bad'
+    JUDGMENT_REJECT = 'reject'
+    JUDGMENTS = [
+        (JUDGMENT_EXCELLENT, 'Excellent'),
+        (JUDGMENT_GOOD, 'Bon'),
+        (JUDGMENT_AVERAGE, 'Passable'),
+        (JUDGMENT_BAD, 'Mauvais'),
+        (JUDGMENT_REJECT, 'À rejeter'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Utilisateur")
+    resolution = models.ForeignKey('Resolution', on_delete=models.CASCADE, verbose_name="Résolution")
+    judgment_for = models.CharField(max_length=20, choices=JUDGMENTS, verbose_name="Jugement pour",default='average')
+    judgment_against = models.CharField(max_length=20, choices=JUDGMENTS, verbose_name="Jugement contre", default='average')
+    voted_at = models.DateTimeField(auto_now_add=True, verbose_name="Date du vote")
+
+    class Meta:
+        unique_together = ('user', 'resolution')  # Un utilisateur ne peut voter qu'une fois par résolution
+
+    def __str__(self):
+        return f"{self.user.username} a voté pour {self.resolution.title}"
+
+def calculate_median_judgment(votes):
+    # Liste des jugements triés par ordre croissant
+    judgment_order = {
+        'reject': 0,
+        'bad': 1,
+        'average': 2,
+        'good': 3,
+        'excellent': 4,
+    }
+
+    if not votes:
+        return None
+
+    # Récupère tous les jugements
+    judgments = [vote.judgment_for for vote in votes]  # ou judgment_against selon le contexte
+
+    # Trie les jugements par ordre croissant
+    sorted_judgments = sorted(judgments, key=lambda x: judgment_order[x])
+
+    # Calcule la note médiane
+    n = len(sorted_judgments)
+    if n % 2 == 1:
+        median_judgment = sorted_judgments[n // 2]
+    else:
+        median_judgment = sorted_judgments[n // 2 - 1]  # ou prendre la moyenne des deux valeurs centrales
+
+    return median_judgment

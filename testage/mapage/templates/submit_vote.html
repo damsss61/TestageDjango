@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Voter - {{ resolution.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="mb-0">Voter pour : {{ resolution.title }}</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-4 text-muted">{{ resolution.question }}</h6>
+                    <p class="card-text">{{ resolution.context|linebreaks }}</p>
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Jugement pour -->
+                        <div class="mb-4">
+                            <h6>{{ form.judgment_for.label }}</h6>
+                            {% for judgment in form.judgment_for %}
+                                <div class="form-check">
+                                    {{ judgment.tag }}
+                                    <label class="form-check-label" for="{{ judgment.id_for_label }}">
+                                        {{ judgment.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Jugement contre -->
+                        <div class="mb-4">
+                            <h6>{{ form.judgment_against.label }}</h6>
+                            {% for judgment in form.judgment_against %}
+                                <div class="form-check">
+                                    {{ judgment.tag }}
+                                    <label class="form-check-label" for="{{ judgment.id_for_label }}">
+                                        {{ judgment.choice_label }}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary" id="submitVoteBtn">
+                                <span id="voteBtnText">Soumettre mon vote</span>
+                                <span id="voteBtnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                            <a href="{% url 'comments_summary' resolution.id %}" class="btn btn-outline-secondary">
+                                Retour au résumé des opinions
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Désactive le bouton après clic pour éviter les doubles soumissions
+    document.getElementById('voteForm').addEventListener('submit', function() {
+        const submitBtn = document.getElementById('submitVoteBtn');
+        const btnText = document.getElementById('voteBtnText');
+        const spinner = document.getElementById('voteBtnSpinner');
+
+        // Désactive le bouton et affiche un spinner
+        submitBtn.disabled = true;
+        btnText.textContent = 'Vote en cours...';
+        spinner.classList.remove('d-none');
+
+        // Réactive le bouton après 3 secondes (au cas où la requête échouerait)
+        setTimeout(() => {
+            submitBtn.disabled = false;
+            btnText.textContent = 'Soumettre mon vote';
+            spinner.classList.add('d-none');
+        }, 3000);
+    });
+</script>
+{% endblock %}

@@ -1,7 +1,5 @@
 from django import forms
-from .models import Resolution
-from .models import Comment
-
+from .models import Resolution, Comment, Vote
 class ResolutionForm(forms.ModelForm):
     class Meta:
         model = Resolution
@@ -16,4 +14,16 @@ class CommentForm(forms.ModelForm):
         fields = ['content']
         widgets = {
             'content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Ajoutez votre commentaire ici...'}),
+        }
+class VoteForm(forms.ModelForm):
+    class Meta:
+        model = Vote
+        fields = ['judgment_for', 'judgment_against']
+        widgets = {
+            'judgment_for': forms.RadioSelect,
+            'judgment_against': forms.RadioSelect,
+        }
+        labels = {
+            'judgment_for': 'Jugement pour cette résolution :',
+            'judgment_against': 'Jugement contre cette résolution :',
         }

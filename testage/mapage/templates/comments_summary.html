@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Résumé des opinions - {{ resolution.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <!-- Carte pour le résumé des opinions -->
+            <div class="card shadow mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Résumé des opinions pour "{{ resolution.title }}"</h5>
+                </div>
+                <div class="card-body">
+                    <h6>Opinions les plus soutenues :</h6>
+                    {% if top_comments %}
+                        {% for comment in top_comments %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="card-text mb-0">{{ comment.content|linebreaks }}</p>
+                                        <small class="text-muted">Par {{ comment.author.username }} | {{ comment.created_at|date:"d/m/Y à H:i" }}</small>
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success me-2">{{ comment.upvote_count }} upvotes</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">Aucune opinion pour cette résolution.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Bouton pour passer au vote -->
+            <div class="d-grid gap-2">
+                <a href="{% url 'submit_vote' resolution.id %}" class="btn btn-primary btn-lg">
+                    Passer au vote
+                </a>
+                <a href="{% url 'resolution_summary' resolution.id %}" class="btn btn-outline-secondary">
+                    Retour au résumé
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

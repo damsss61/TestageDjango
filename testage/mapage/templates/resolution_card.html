@@ -13,14 +13,33 @@
       <p class="card-text text-muted">{{ resolution.context|truncatechars:100 }}</p>
     </div>
     <div class="card-footer bg-transparent">
-      {% if resolution.status == 'draft' and request.user == resolution.created_by %}
-        <a href="{% url 'edit_resolution' resolution.id %}" class="btn btn-sm btn-outline-primary">Éditer</a>
-      {% else %}
+      {% if resolution.status == 'draft' %}
+        {% if request.user == resolution.created_by %}
+          <a href="{% url 'edit_resolution' resolution.id %}" class="btn btn-sm btn-outline-primary">Éditer</a>
+        {% endif %}
+
+      {% elif resolution.status == 'evaluation' %}
         <a href="{% url 'resolution_details' resolution.id %}" class="btn btn-sm btn-outline-primary">Voir les détails</a>
-        {% if resolution.status == 'evaluation' and request.user.is_authenticated %}
-          {% if resolution.id in user_commented_resolutions %}
-            <a href="{% url 'read_comments' resolution.id %}" class="btn btn-sm btn-outline-success">Lire les commentaires</a>
-          {% endif %}
+        {% if request.user.is_authenticated and resolution.id in user_commented_resolutions %}
+          <a href="{% url 'read_comments' resolution.id %}" class="btn btn-sm btn-outline-success">Lire les commentaires</a>
+        {% endif %}
+
+      {% elif resolution.status == 'voting' %}
+        <a href="{% url 'resolution_summary' resolution.id %}" class="btn btn-sm btn-outline-warning">Résumé et vote</a>
+
+      {% elif resolution.status == 'resolved' %}
+        <a href="{% url 'vote_results' resolution.id %}" class="btn btn-sm btn-outline-success">Voir les résultats</a>
+      {% endif %}
+      
+      {% if request.user == resolution.created_by %}
+        {% if resolution.status == 'evaluation' %}
+          <a href="{% url 'start_voting' resolution.id %}" class="btn btn-sm btn-outline-secondary me-1">
+            <i class="bi bi-ballot"></i> Passer à la phase de vote
+          </a>
+        {% elif resolution.status == 'voting' %}
+          <a href="{% url 'close_voting' resolution.id %}" class="btn btn-sm btn-outline-secondary me-1">
+            <i class="bi bi-check2-square"></i> Clôturer le vote
+          </a>
         {% endif %}
       {% endif %}
     </div>

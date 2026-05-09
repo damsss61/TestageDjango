@@ -18,7 +18,7 @@
                         {{ form|crispy }}
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary">Publier l'opinion</button>
-                            <a href="{% url 'read_comments' resolution.id %}" class="btn btn-secondary">Annuler</a>
+                            <a href="{% url 'resolution_details' resolution.id %}" class="btn btn-secondary">Annuler</a>
                         </div>
                     </form>
                 </div>
